@@ -21,10 +21,13 @@ namespace SchoolApi.Controllers
             var subjects = _dataContext.Subjects.ToList();
 
             if (!subjects.Any())
-                return NotFound();
-
-            var subjectModels = subjects.Select(s => new SubjectModel()
             {
+                return NotFound();
+            }
+                
+            var subjectModels = subjects.Select(s => new ReadSubjectModel()
+            {
+                Id = s.Id,
                 SubjectName = s.SubjectName,
                 Description = s.Description,
             });
@@ -39,10 +42,13 @@ namespace SchoolApi.Controllers
                 .FirstOrDefault(x => x.Id == id);
 
             if (subject == null)
-                return NotFound($"Subject with ID {id} not found.");
-
-            var subjectModel = new SubjectModel()
             {
+                return NotFound($"Subject with ID {id} not found.");
+            }
+                
+            var subjectModel = new ReadSubjectModel()
+            {
+                Id = subject.Id,
                 SubjectName = subject.SubjectName,
                 Description = subject.Description,
             };
@@ -59,9 +65,13 @@ namespace SchoolApi.Controllers
                 .ToList();
 
             if (!subjects.Any())
+            {
                 return NotFound();
-
-            var subjectModels = subjects.Select(s => new SubjectModel() { 
+            }
+                
+            var subjectModels = subjects.Select(s => new ReadSubjectModel() 
+            { 
+                Id = s.Id,
                 SubjectName = s.SubjectName,
                 Description = s.Description,
             });
@@ -70,7 +80,7 @@ namespace SchoolApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddSubject(SubjectModel model)
+        public IActionResult AddSubject(CreateSubjectModel model)
         {
             var subject = _dataContext.Subjects
                 .FirstOrDefault(s => s.SubjectName == model.SubjectName);
@@ -93,7 +103,7 @@ namespace SchoolApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateSubject(SubjectModel model, int id)
+        public IActionResult UpdateSubject(CreateSubjectModel model, int id)
         {
             var updateSubject = _dataContext.Subjects
                 .FirstOrDefault(s => s.Id == id);

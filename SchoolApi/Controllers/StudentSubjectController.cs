@@ -33,10 +33,8 @@ namespace SchoolApi.Controllers
         [HttpDelete]
         public IActionResult DeleteStudentSubject(int studentId, int subjectId)
         {
-            var studentSubjectToDelete = _dataContext.
-                StudentSubjects.
-                FirstOrDefault(s => s.StudentId == studentId
-                && s.SubjectId == subjectId);
+            var studentSubjectToDelete = _dataContext.StudentSubjects
+                .FirstOrDefault(s => s.StudentId == studentId && s.SubjectId == subjectId);
 
             if (studentSubjectToDelete == null)
             {

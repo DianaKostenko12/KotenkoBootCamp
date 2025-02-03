@@ -2,7 +2,7 @@
 
 namespace SchoolApi.Models
 {
-    public class SubjectModel
+    public class CreateSubjectModel
     {
         [Required]
         public string SubjectName { get; set; }

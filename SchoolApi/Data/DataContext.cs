@@ -18,12 +18,15 @@ namespace SchoolApi.Data
         {
             modelBuilder.Entity<StudentSubject>(builder =>
             {
-                builder.HasKey(ss => new { ss.StudentId, ss.SubjectId });
-                builder.HasOne(s => s.Student)
-                .WithMany(ss => ss.StudentSubjects);
-                builder.HasOne(s => s.Subject)
-                .WithMany(ss => ss.StudentSubjects)
-                .HasForeignKey(s => s.SubjectId);
+                builder
+                    .HasKey(ss => new { ss.StudentId, ss.SubjectId });
+                builder
+                    .HasOne(s => s.Student)
+                    .WithMany(ss => ss.StudentSubjects);
+                builder
+                    .HasOne(s => s.Subject)
+                    .WithMany(ss => ss.StudentSubjects)
+                    .HasForeignKey(s => s.SubjectId);
             });
 
             base.OnModelCreating(modelBuilder);

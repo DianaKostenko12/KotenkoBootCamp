@@ -19,14 +19,17 @@ namespace SchoolApi.Controllers
         [HttpGet]
         public IActionResult GetStudents()
         {
-            var students = _dataContext.Students
-                .ToList();
+            var students = _dataContext.Students.ToList();
 
-            if(!students.Any())
-                return NotFound();
-
-            var studentModels = students.Select(s => new StudentModel()
+            if (!students.Any())
             {
+
+                return NotFound();
+            }
+
+            var studentModels = students.Select(s => new ReadStudentModel()
+            {
+                Id = s.Id,
                 Name = s.Name,
                 Surname = s.Surname,
                 Patronymic = s.Patronymic,
@@ -43,11 +46,14 @@ namespace SchoolApi.Controllers
             var student = _dataContext.Students
                 .FirstOrDefault(x => x.Id == id);
 
-            if(student == null)
-                return NotFound($"Student with ID {id} not found.");
-
-            var studentModel = new StudentModel()
+            if (student == null)
             {
+                return NotFound($"Student with ID {id} not found.");
+            }
+
+            var studentModel = new ReadStudentModel()
+            {
+                Id = student.Id,
                 Name = student.Name,
                 Surname = student.Surname,
                 Patronymic = student.Patronymic,
@@ -71,7 +77,9 @@ namespace SchoolApi.Controllers
                 return NotFound();
             }
 
-            var studentModels = students.Select(s => new StudentModel() {
+            var studentModels = students.Select(s => new ReadStudentModel() 
+            {
+                Id = s.Id,
                 Name = s.Name,
                 Surname = s.Surname,
                 Patronymic = s.Patronymic,
@@ -83,7 +91,7 @@ namespace SchoolApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult AddStudent(StudentModel model)
+        public IActionResult AddStudent(CreateStudentModel model)
         {
             var student = _dataContext.Students
                 .FirstOrDefault(s => s.Phone == model.Phone);
@@ -109,7 +117,7 @@ namespace SchoolApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult UpdateStudent(StudentModel model, int id)
+        public IActionResult UpdateStudent(CreateStudentModel model, int id)
         {
             var updateStudent = _dataContext.Students
                 .FirstOrDefault(s => s.Id == id);
