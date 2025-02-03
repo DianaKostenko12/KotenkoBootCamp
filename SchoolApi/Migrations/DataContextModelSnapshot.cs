@@ -50,7 +50,7 @@ namespace SchoolApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Students");
+                    b.ToTable("Students", (string)null);
                 });
 
             modelBuilder.Entity("SchoolApi.Entities.StudentSubject", b =>
@@ -65,7 +65,7 @@ namespace SchoolApi.Migrations
 
                     b.HasIndex("SubjectId");
 
-                    b.ToTable("StudentSubjects");
+                    b.ToTable("StudentSubjects", (string)null);
                 });
 
             modelBuilder.Entity("SchoolApi.Entities.Subject", b =>
@@ -85,7 +85,7 @@ namespace SchoolApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("Subjects", (string)null);
                 });
 
             modelBuilder.Entity("SchoolApi.Entities.StudentSubject", b =>

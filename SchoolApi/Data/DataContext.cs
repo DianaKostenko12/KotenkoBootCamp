@@ -16,16 +16,15 @@ namespace SchoolApi.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<StudentSubject>()
-                .HasKey(ss => new { ss.StudentId, ss.SubjectId });
-            modelBuilder.Entity<StudentSubject>()
-                .HasOne(s => s.Student)
-                .WithMany(ss => ss.StudentSubjects)
-                .HasForeignKey(s => s.StudentId);
-            modelBuilder.Entity<StudentSubject>()
-                .HasOne(s => s.Subject)
+            modelBuilder.Entity<StudentSubject>(builder =>
+            {
+                builder.HasKey(ss => new { ss.StudentId, ss.SubjectId });
+                builder.HasOne(s => s.Student)
+                .WithMany(ss => ss.StudentSubjects);
+                builder.HasOne(s => s.Subject)
                 .WithMany(ss => ss.StudentSubjects)
                 .HasForeignKey(s => s.SubjectId);
+            });
 
             base.OnModelCreating(modelBuilder);
         }

@@ -18,9 +18,6 @@ namespace SchoolApi.Controllers
         [HttpPost]
         public IActionResult AddStudentSubject(int studentId, int subjectId)
         {
-            if (studentId <= 0 || subjectId <= 0)
-                return BadRequest("Invalid ID.");
-
             var createStudentSubject = new StudentSubject()
             {
                 StudentId = studentId,
@@ -29,19 +26,17 @@ namespace SchoolApi.Controllers
 
             _dataContext.StudentSubjects.Add(createStudentSubject);
             _dataContext.SaveChanges();
+
             return Ok("Successfully created");
         }
 
         [HttpDelete]
         public IActionResult DeleteStudentSubject(int studentId, int subjectId)
         {
-            if (studentId <= 0 || subjectId <= 0)
-                return BadRequest("Invalid ID.");
-
             var studentSubjectToDelete = _dataContext.
-                StudentSubjects.Where(s => s.StudentId == studentId 
-                && s.SubjectId == subjectId).
-                FirstOrDefault();
+                StudentSubjects.
+                FirstOrDefault(s => s.StudentId == studentId
+                && s.SubjectId == subjectId);
 
             if (studentSubjectToDelete == null)
             {
@@ -50,6 +45,7 @@ namespace SchoolApi.Controllers
 
             _dataContext.Remove(studentSubjectToDelete);
             _dataContext.SaveChangesAsync();
+
             return Ok("Successfully deleted");
         }
     }

@@ -19,47 +19,74 @@ namespace SchoolApi.Controllers
         [HttpGet]
         public IActionResult GetStudents()
         {
-            var students = _dataContext.Students.ToList();
-            if(students == null)
+            var students = _dataContext.Students
+                .ToList();
+
+            if(!students.Any())
                 return NotFound();
 
-            return Ok(students);
+            var studentModels = students.Select(s => new StudentModel()
+            {
+                Name = s.Name,
+                Surname = s.Surname,
+                Patronymic = s.Patronymic,
+                Class = s.Class,
+                Phone = s.Phone
+            });
+
+            return Ok(studentModels);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetStudentById(int id) 
         {
-            if(id <= 0) 
-                return BadRequest("Invalid student ID.");
+            var student = _dataContext.Students
+                .FirstOrDefault(x => x.Id == id);
 
-            var student = _dataContext.Students.FirstOrDefault(x => x.Id == id);
             if(student == null)
                 return NotFound($"Student with ID {id} not found.");
 
-            return Ok(student);
+            var studentModel = new StudentModel()
+            {
+                Name = student.Name,
+                Surname = student.Surname,
+                Patronymic = student.Patronymic,
+                Class = student.Class,
+                Phone = student.Phone
+            };
+
+            return Ok(studentModel);
         }
 
         [HttpGet("subject")]
         public IActionResult GetStudentsBySubjectId([FromQuery] int subjectId)
         {
-            if (subjectId <= 0)
-                return BadRequest("Invalid subject ID.");
+            var students = _dataContext.StudentSubjects
+                .Where(s => s.SubjectId == subjectId)
+                .Select(student => student.Student)
+                .ToList();
 
-            var students = _dataContext.StudentSubjects.Where(s => s.SubjectId == subjectId).Select(student => student.Student).ToList();
-
-            if (students == null)
+            if (!students.Any())
+            {
                 return NotFound();
+            }
 
-            return Ok(students);
+            var studentModels = students.Select(s => new StudentModel() {
+                Name = s.Name,
+                Surname = s.Surname,
+                Patronymic = s.Patronymic,
+                Class = s.Class,
+                Phone = s.Phone
+            });
+
+            return Ok(studentModels);
         }
 
         [HttpPost]
         public IActionResult AddStudent(StudentModel model)
         {
-            if (model == null)
-                return BadRequest("Student model is empty");
-
-            var student = _dataContext.Students.Where(s => s.Phone == model.Phone).FirstOrDefault();
+            var student = _dataContext.Students
+                .FirstOrDefault(s => s.Phone == model.Phone);
 
             if(student != null)
             {
@@ -77,25 +104,21 @@ namespace SchoolApi.Controllers
 
             _dataContext.Students.Add(createStudent);
             _dataContext.SaveChanges();
+
             return Ok("Successfully created");
         }
 
         [HttpPut]
         public IActionResult UpdateStudent(StudentModel model, int id)
         {
-            if (model == null)
-                return BadRequest("Student model is empty");
+            var updateStudent = _dataContext.Students
+                .FirstOrDefault(s => s.Id == id);
 
-            if (id <= 0)
-                return BadRequest("Invalid student ID.");
-
-            var updateStudent = _dataContext.Students.Where(s => s.Id == id).FirstOrDefault();
             if(updateStudent == null)
             {
                 return NotFound("Student was not found");
             }
           
-
             updateStudent.Surname = model.Surname;
             updateStudent.Name = model.Name;
             updateStudent.Patronymic = model.Patronymic;
@@ -103,16 +126,16 @@ namespace SchoolApi.Controllers
             updateStudent.Phone = model.Phone;
            
             _dataContext.SaveChangesAsync();
+
             return Ok("Successfully updated");
         }
 
         [HttpDelete]
         public IActionResult DeleteStudent(int id)
         {
-            if (id <= 0)
-                return BadRequest("Invalid student ID.");
+            var studentToDelete = _dataContext.Students
+                .FirstOrDefault(s => s.Id == id);
 
-            var studentToDelete = _dataContext.Students.Where(s => s.Id == id).FirstOrDefault();
             if (studentToDelete == null)
             {
                 return NotFound("Student was not found");
@@ -120,6 +143,7 @@ namespace SchoolApi.Controllers
 
             _dataContext.Remove(studentToDelete);
             _dataContext.SaveChangesAsync();
+
             return Ok("Successfully deleted");
         }
     }

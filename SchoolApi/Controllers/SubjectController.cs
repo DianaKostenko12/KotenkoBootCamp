@@ -19,46 +19,61 @@ namespace SchoolApi.Controllers
         public IActionResult GetSubjects()
         {
             var subjects = _dataContext.Subjects.ToList();
-            if (subjects == null)
+
+            if (!subjects.Any())
                 return NotFound();
 
-            return Ok(subjects);
+            var subjectModels = subjects.Select(s => new SubjectModel()
+            {
+                SubjectName = s.SubjectName,
+                Description = s.Description,
+            });
+
+            return Ok(subjectModels);
         }
 
         [HttpGet("{id}")]
         public IActionResult GetSubjectById(int id)
         {
-            if (id <= 0)
-                return BadRequest("Invalid subject ID.");
+            var subject = _dataContext.Subjects
+                .FirstOrDefault(x => x.Id == id);
 
-            var subject = _dataContext.Subjects.FirstOrDefault(x => x.Id == id);
             if (subject == null)
                 return NotFound($"Subject with ID {id} not found.");
 
-            return Ok(subject);
+            var subjectModel = new SubjectModel()
+            {
+                SubjectName = subject.SubjectName,
+                Description = subject.Description,
+            };
+
+            return Ok(subjectModel);
         }
 
         [HttpGet("student")]
         public IActionResult GetSubjectsByStudentId([FromQuery] int studentId)
         {
-            if (studentId <= 0)
-                return BadRequest("Invalid subject ID.");
+            var subjects = _dataContext.StudentSubjects
+                .Where(s => s.StudentId == studentId)
+                .Select(subject => subject.Subject)
+                .ToList();
 
-            var subjects = _dataContext.StudentSubjects.Where(s => s.StudentId == studentId).Select(subject => subject.Subject).ToList();
-
-            if (subjects == null)
+            if (!subjects.Any())
                 return NotFound();
 
-            return Ok(subjects);
+            var subjectModels = subjects.Select(s => new SubjectModel() { 
+                SubjectName = s.SubjectName,
+                Description = s.Description,
+            });
+
+            return Ok(subjectModels);
         }
 
         [HttpPost]
         public IActionResult AddSubject(SubjectModel model)
         {
-            if (model == null)
-                return BadRequest("Subject model is empty");
-
-            var subject = _dataContext.Subjects.Where(s => s.SubjectName == model.SubjectName).FirstOrDefault();
+            var subject = _dataContext.Subjects
+                .FirstOrDefault(s => s.SubjectName == model.SubjectName);
 
             if (subject != null)
             {
@@ -73,19 +88,16 @@ namespace SchoolApi.Controllers
 
             _dataContext.Subjects.Add(createSubject);
             _dataContext.SaveChanges();
+
             return Ok("Successfully created");
         }
 
         [HttpPut]
         public IActionResult UpdateSubject(SubjectModel model, int id)
         {
-            if (model == null)
-                return BadRequest("Subject model is empty");
+            var updateSubject = _dataContext.Subjects
+                .FirstOrDefault(s => s.Id == id);
 
-            if (id <= 0)
-                return BadRequest("Invalid subject ID.");
-
-            var updateSubject = _dataContext.Subjects.Where(s => s.Id == id).FirstOrDefault();
             if (updateSubject == null)
             {
                 return NotFound("Subject was not found");
@@ -93,18 +105,18 @@ namespace SchoolApi.Controllers
 
             updateSubject.SubjectName = model.SubjectName;
             updateSubject.Description = model.Description;
-            
+
             _dataContext.SaveChangesAsync();
+
             return Ok("Successfully updated");
         }
 
         [HttpDelete]
         public IActionResult DeleteSubject(int id)
         {
-            if (id <= 0)
-                return BadRequest("Invalid subject ID.");
+            var subjectToDelete = _dataContext.Subjects
+                .FirstOrDefault(s => s.Id == id);
 
-            var subjectToDelete = _dataContext.Subjects.Where(s => s.Id == id).FirstOrDefault();
             if (subjectToDelete == null)
             {
                 return NotFound("Subject was not found");
@@ -112,6 +124,7 @@ namespace SchoolApi.Controllers
 
             _dataContext.Remove(subjectToDelete);
             _dataContext.SaveChangesAsync();
+
             return Ok("Successfully deleted");
         }
     }

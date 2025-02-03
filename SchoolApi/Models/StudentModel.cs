@@ -12,7 +12,7 @@ namespace SchoolApi.Models
         public string Patronymic { get; set; }
         [Required]
         public string Class { get; set; }
-        [Required][Phone]
+        [Required, Phone]
         public string Phone { get; set; }
     }
 }
