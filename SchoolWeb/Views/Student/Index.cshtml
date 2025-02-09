@@ -1,0 +1,77 @@
+﻿@model List<Student> 
+
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1 class="display-4">Students</h1>
+<table class="table table-striped"> 
+    <div>
+        @Html.ActionLink("Create New Student", "Create", "Student", new { }, new { @class = "btn btn-primary" })
+    </div>
+
+    <thead>
+        <tr>
+            <th>Surname</th>
+            <th>Name</th>
+            <th>Patronymic</th>
+            <th>Class</th>
+            <th>Phone</th>
+            <th>Subjects</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+   <tbody>
+       @foreach (var student in Model)
+       {
+            <tr>
+                <td>
+                    <div>
+                        @student.Surname
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        @student.Name
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        @student.Patronymic
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        @student.Class
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        @student.Phone
+                    </div>
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary">Subjects</button>
+                        <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="visually-hidden"></span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            @foreach(var studentSubject in student.StudentSubjects)
+                            {
+                                <li class="dropdown-item">@studentSubject.Subject.SubjectName</li>
+                            }
+                        </ul>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        @Html.ActionLink("Update", "Update", "Student", new { id = student.Id }, new { @class = "btn btn-warning btn-sm" })|
+                        @Html.ActionLink("Delete", "Delete", "Student", new { id = student.Id }, new { @class = "btn btn-danger btn-sm"  })
+                    </div>
+                </td>
+            </tr>
+       }
+    </tbody>
+</table>

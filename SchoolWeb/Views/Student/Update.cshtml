@@ -1,0 +1,65 @@
+﻿@using SchoolWeb.DTOs
+@model Student
+
+@{
+    ViewBag.Title = "Edit Student";
+}
+
+<h2>Update Student</h2>
+
+@using (Html.BeginForm("Update", "Student", FormMethod.Post))
+{
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Student Data</legend>
+        <div class="text-danger">
+            <input type="hidden" asp-for="Id" />
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Surname)
+            <div class="col-sm-6">
+                @Html.TextBoxFor(model => model.Surname, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Surname, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name)
+            <div class="col-sm-6">
+                @Html.TextBoxFor(model => model.Name, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Patronymic)
+            <div class="col-sm-6">
+                @Html.TextBoxFor(model => model.Patronymic, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Patronymic, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Class)
+            <div class="col-sm-6">
+                @Html.TextBoxFor(model => model.Class, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Class, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Phone)
+            <div class="col-sm-6">
+                @Html.TextBoxFor(model => model.Phone, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <input type="submit" value="Save" class="btn btn-primary" />
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to list", "Index")
+</div>

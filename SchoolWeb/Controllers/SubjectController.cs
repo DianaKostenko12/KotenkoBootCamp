@@ -24,19 +24,7 @@ namespace SchoolWeb.Controllers
         {
             var subjects = _dataContext.Subjects.ToList();
 
-            if (!subjects.Any())
-            {
-                return NotFound();
-            }
-
-            var subjectModels = subjects.Select(s => new ReadSubjectModel()
-            {
-                Id = s.Id,
-                SubjectName = s.SubjectName,
-                Description = s.Description,
-            });
-
-            return Ok(subjectModels);
+            return Ok(subjects);
         }
 
         [HttpGet("{id}")]
@@ -45,19 +33,7 @@ namespace SchoolWeb.Controllers
             var subject = _dataContext.Subjects
                 .FirstOrDefault(x => x.Id == id);
 
-            if (subject == null)
-            {
-                return NotFound($"Subject with ID {id} not found.");
-            }
-
-            var subjectModel = new ReadSubjectModel()
-            {
-                Id = subject.Id,
-                SubjectName = subject.SubjectName,
-                Description = subject.Description,
-            };
-
-            return Ok(subjectModel);
+            return Ok(subject);
         }
 
         [HttpGet("student")]
@@ -68,19 +44,7 @@ namespace SchoolWeb.Controllers
                 .Select(subject => subject.Subject)
                 .ToList();
 
-            if (!subjects.Any())
-            {
-                return NotFound();
-            }
-
-            var subjectModels = subjects.Select(s => new ReadSubjectModel()
-            {
-                Id = s.Id,
-                SubjectName = s.SubjectName,
-                Description = s.Description,
-            });
-
-            return Ok(subjectModels);
+            return Ok(subjects);
         }
 
         [HttpPost]
@@ -91,7 +55,7 @@ namespace SchoolWeb.Controllers
 
             if (subject != null)
             {
-                return BadRequest("Subject already exists");
+                return Content("Subject already exists");
             }
 
             var createSubject = new Subject()
@@ -114,7 +78,7 @@ namespace SchoolWeb.Controllers
 
             if (updateSubject == null)
             {
-                return NotFound("Subject was not found");
+                return Content("Subject was not found");
             }
 
             updateSubject.SubjectName = model.SubjectName;
@@ -133,7 +97,7 @@ namespace SchoolWeb.Controllers
 
             if (subjectToDelete == null)
             {
-                return NotFound("Subject was not found");
+                return Content("Subject was not found");
             }
 
             _dataContext.Remove(subjectToDelete);

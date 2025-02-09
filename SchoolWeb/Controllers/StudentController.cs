@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using SchoolWeb.Data;
 using SchoolWeb.DTOs;
 using SchoolWeb.Models;
@@ -9,38 +10,16 @@ namespace SchoolWeb.Controllers
     {
         private readonly DataContext _dataContext;
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         public StudentController(DataContext dataContext)
         {
             _dataContext = dataContext;
         }
 
-        [HttpGet]
-        public IActionResult GetStudents()
+        //[HttpGet]
+        public IActionResult Index()
         {
-            var students = _dataContext.Students.ToList();
-
-            if (!students.Any())
-            {
-
-                return NotFound();
-            }
-
-            var studentModels = students.Select(s => new ReadStudentModel()
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Surname = s.Surname,
-                Patronymic = s.Patronymic,
-                Class = s.Class,
-                Phone = s.Phone
-            });
-
-            return Ok(studentModels);
+            var students = _dataContext.Students.Include(s => s.StudentSubjects).ThenInclude(ss => ss.Subject).ToList();
+            return View(students);
         }
 
         [HttpGet("{id}")]
@@ -49,22 +28,7 @@ namespace SchoolWeb.Controllers
             var student = _dataContext.Students
                 .FirstOrDefault(x => x.Id == id);
 
-            if (student == null)
-            {
-                return NotFound($"Student with ID {id} not found.");
-            }
-
-            var studentModel = new ReadStudentModel()
-            {
-                Id = student.Id,
-                Name = student.Name,
-                Surname = student.Surname,
-                Patronymic = student.Patronymic,
-                Class = student.Class,
-                Phone = student.Phone
-            };
-
-            return Ok(studentModel);
+            return Ok(student);
         }
 
         [HttpGet("subject")]
@@ -75,33 +39,25 @@ namespace SchoolWeb.Controllers
                 .Select(student => student.Student)
                 .ToList();
 
-            if (!students.Any())
-            {
-                return NotFound();
-            }
-
-            var studentModels = students.Select(s => new ReadStudentModel()
-            {
-                Id = s.Id,
-                Name = s.Name,
-                Surname = s.Surname,
-                Patronymic = s.Patronymic,
-                Class = s.Class,
-                Phone = s.Phone
-            });
-
-            return Ok(studentModels);
+            return Ok(students);
         }
 
-        [HttpPost]
+        [HttpGet]
+        public ActionResult Create()
+        {
+            var student = new Student();
+            return View(student);
+        }
+
+        [HttpPost, ActionName("Create")]
         public IActionResult AddStudent(CreateStudentModel model)
         {
             var student = _dataContext.Students
-                .FirstOrDefault(s => s.Phone == model.Phone);
+            .FirstOrDefault(s => s.Phone == model.Phone);
 
             if (student != null)
             {
-                return BadRequest("Student already exists");
+                return Content("Student already exists");
             }
 
             var createStudent = new Student()
@@ -113,21 +69,33 @@ namespace SchoolWeb.Controllers
                 Phone = model.Phone
             };
 
+            if (!ModelState.IsValid) 
+            {
+                return View(createStudent);
+            }
+
             _dataContext.Students.Add(createStudent);
             _dataContext.SaveChanges();
 
-            return Ok("Successfully created");
+            return RedirectToAction("Index");
         }
 
-        [HttpPut]
-        public IActionResult UpdateStudent(CreateStudentModel model, int id)
+        [HttpGet]
+        public IActionResult Update(int id) 
+        { 
+            var student = _dataContext.Students.FirstOrDefault(s => s.Id == id);
+            return View(student);
+        }
+
+        [HttpPost]
+        public IActionResult Update(Student model, int id)
         {
             var updateStudent = _dataContext.Students
                 .FirstOrDefault(s => s.Id == id);
 
             if (updateStudent == null)
             {
-                return NotFound("Student was not found");
+                return Content("Student was not found");
             }
 
             updateStudent.Surname = model.Surname;
@@ -138,10 +106,23 @@ namespace SchoolWeb.Controllers
 
             _dataContext.SaveChangesAsync();
 
-            return Ok("Successfully updated");
+            return View();
         }
 
-        [HttpDelete]
+        public IActionResult Delete(int id) 
+        {
+            var studentToDelete = _dataContext.Students
+               .FirstOrDefault(s => s.Id == id);
+
+            if (studentToDelete == null)
+            {
+                return View("Student was not found");
+            }
+
+            return View(studentToDelete);
+        }
+
+        [HttpPost, ActionName("Delete")]
         public IActionResult DeleteStudent(int id)
         {
             var studentToDelete = _dataContext.Students
@@ -149,13 +130,13 @@ namespace SchoolWeb.Controllers
 
             if (studentToDelete == null)
             {
-                return NotFound("Student was not found");
+                return View("Student was not found");
             }
 
             _dataContext.Remove(studentToDelete);
             _dataContext.SaveChangesAsync();
 
-            return Ok("Successfully deleted");
+            return RedirectToAction("Index");
         }
     }
 }
